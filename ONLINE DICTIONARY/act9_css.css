@@ -1,0 +1,150 @@
+#container {
+  margin:auto;
+  /*width: 760px; */
+width:100%; 
+height:100%;
+  background: #ffffff;
+}
+#lefthead {
+  float: left; 
+  /*width: 150px;*/
+width:15% ;
+height:18%;
+  background: #EBEBEB; 
+}
+#header {
+float: left; 
+  background: #DDDDDD;
+background-image:url(extra/black-grunge-background.jpg);
+width:70%;
+height:18%;
+color:white;
+text-align:center;
+
+}
+#rightheadtop {
+  float: left; 
+  /*width: 150px;*/
+width:15% ;
+height:6%;
+  background-image:url(extra/black-grunge-background.jpg);
+}
+
+#rightheaddown
+{
+float:left;
+width:15%;
+height:12%;
+background-image:url(extra/black-grunge-background.jpg);
+
+}
+#menu{
+background: white;
+height:2%;
+
+padding:0;
+margin:0;
+}
+#menu ul{
+padding:0;
+margin:0;
+}
+#menu li{
+position: relative;
+float: left;
+list-style: none;
+margin: 0;
+padding:0;
+}
+
+#menu li a{
+width:230px;
+height: 30px;
+display: block;
+text-decoration:none;
+text-align: center;
+line-height: 30px;
+background-color: white;
+color: purple;
+}
+#menu li a:hover{
+background-color: lightblue;
+}
+#menu ul ul{
+position: absolute;
+top: 30px;
+visibility: hidden;
+}
+#menu ul li:hover ul{
+visibility:visible;
+}
+#leftBar {
+  float: left; 
+
+  /*width: 150px;*/
+width:20% ;
+height:60%;
+background-image:url(extra/2-No-Substitute.jpg); 
+/*  background: #EBEBEB;*/ 
+}
+
+#content {
+  float:left;
+ /* width:450px;*/
+width:60%;
+height:60%;
+/*background-image:url(extra/dic1_2.png);*/ 
+background-position:center;
+background-repeat:no-repeat;
+/*  background-color: #cdcde6;*/
+}
+
+
+#rightBar { 
+  float:right; 
+ /* width: 160px;*/
+width:20%; 
+height:60%;
+  background: #EBEBEB;
+background-image:url(extra/2-No-Substitute.jpg); 
+}
+.scrollable { 
+height=380px;
+ width=800px; 
+overflow-y: auto;
+ 
+} 
+
+
+#footer { 
+  clear:both;
+height:20%;
+color:white;
+background-image:url(extra/black-grunge-background.jpg);
+ /* background:#DDDDDD;*/
+}
+#footer a:link
+{
+visibility:visible;
+color:grey;
+}
+
+
+#footer a:hover
+{
+visibility:visible;
+color:yellow;
+}
+
+#content show_details a:link
+{
+visibility:visible;
+color:grey;
+}
+
+
+#content show_details a:hover
+{
+visibility:visible;
+color:golden;
+}
