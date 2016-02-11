@@ -1,0 +1,87 @@
+Done
+---
+- return EAGAIN, when queue is full.
+- instantiating new queue(s) when the module is loaded
+- Flush the queue data before unloading the module
+- Discuss and decide on priority (with workqueue: only low and high priority possible) | reorder queues
+- cancel/flush queue (flush?)
+        - Cancelling mechanism depends on the identifier (Create a custom identifier: job_id)
+        - Maintain the mapping of the job ("referrence" to the work object) to its identifier
+
+- List all the jobs in the queue (List them in userland)
+- deletion of jobs from custom queue is now done as soon as consumer is called so that the jobs currently in execution are not displayed in list command
+- Study how cryptoApi works
+        - Use cryptoApi for encryption/decryption, compression/decompression and checksum
+- Features
+	- compress/decompress
+	- concat
+	- checksum
+	- encryption/decryption
+	- listing the job queue
+	- cancelling a job from the queue
+	- changing the priority of a job
+
+- Callback: using Netlink sockets: communicating via pid which is sent in the job_obj itself.
+	[Archive]
+	- Discuss and decide on the returning (actual callback for user) mechanism : (Hari used netlink sockets) : Read about aio
+        	Options listed to be explored : (see how the AIO syscalls work) | "netlink" sockets
+        	- signals
+        	- shared memory
+        	- polling a descriptor
+        	- any other facility you deem suitable
+
+- Files required to be in /hw3 dir
+	- kernel.config
+        - Makefile in hw3/ directory.
+
+- locks to be implemented
+         <options: (spinlock, mutex, rwsem, rcu)>
+        - job_cnt : implement seperate job_cnt for low and high prio queue
+        - job_id_cnt
+        - Check if locks required for enquing in workqueue
+        - Locking on the custom list (mapping of identifier and work object)
+
+
+todo
+----
+- argslen to be included in the syscall signature
+
+- Before submission
+        - design.pdf
+        - checkpath.pl
+        - test scripts to be written
+
+- chnage the buffer size of the listBuf in userland
+- do all the validations before the job is enqued. Invalid, non existing filesnames should not be a part of a job
+
+- size of the list to be decided and fixed
+
+- Cleaning to be done: cleaning rest of the data (cypher, etc) in my_work_struct obj
+	- rmmod
+	- end of concat & other features
+	In Error handling (in case of failures)
+		- validation of user_args
+		- copy_from_user
+
+- temperory variables (pos, q, etc) to be made inline 
+	make them local variables instead of global variables 	
+
+- Small user-level programs demonstrating the utility of the new system call
+
+- Test scenario(s):
+	- user process die/exit: No kernel panic(s), handle gracefully
+	
+- design.pdf : to be commited in hw3 folder (mandatory) : 2-5 pages
+	- names of all team members, the class and the date.
+	- specify your design, major data structures, features you've
+		implemented, major functions/methods and what they do, locking semantics,
+		queuing behavior, and anything special we should note
+	- figures and graphs that help explain the architecture
+
+- Study your solution and consider following issues:
+        - efficiency
+        - correctness
+        - concurrency
+        - races
+        - deadlocks
+

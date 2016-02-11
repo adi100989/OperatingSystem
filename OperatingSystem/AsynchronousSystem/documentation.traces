@@ -1,0 +1,33 @@
+- How to check the currently running processes
+	ps aux
+	(This will show the current producer and consumer threads with the given name, kworker if no name or default linux workqueue used)	
+	
+
+- To check the current status of thread of a process
+	cat /proc/<pid>/task/<tid>/status
+
+	(For current state: Sleeping, running, ready)
+	cat /proc/<pid>/task/<tid>/status | grep State
+
+	Example (in our case)
+	- consumer thread name: low_priority_wq ;  pid:17496
+	cat /proc/17496/task/17496/status | grep State 
+
+
+- Flushing the workqueue and destroying it before performing rmmod
+	- flush of all workqueue tasks done: synchronously (rmmod is blocked: waiting for the tasks to be flushed) 
+
+- flags : desciption
+	- a: concat
+	- c: compress
+	- d: decompress
+	- k: checksum
+	- x: encrypt
+	- y: decrypt
+	- p: high priority
+	- f: cancel/delete job
+	- b: change Priority (Plan b ;) )
+	- l: list jobs in queue
+	- h: help
+
+

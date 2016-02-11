@@ -1,0 +1,66 @@
+README.TXT.
+
+---------------------------------------------------------------------
+HW1:CREATING A SYSCALL (LOADABLE MODULE) TO ENCRYPT/ DECRYPT AN INPUT FILE
+---------------------------------------------------------------------
+Name: Aditi Singh
+SBU ID : 110285096
+Course : CSE506
+---------------------------------------------------------------------
+SCOPE:
+  * a strcuture is created in the header file for the arguments
+  * input file is read and using the encrypt function the readbuffer is encrypted
+	page by page till 0 or a few bytes(less than a page size) exists.
+  * if the decrypt option is selected then the decryption hapens in the simlar manner. 
+  * The encrypted/decrypted data is first stored into a buffer and then written onto a
+    output file. If file exists then overwritten, else created a new one. 
+  * various checks are done to ensure that files exist, password exists, encryption is done 
+    if -e flag selected and decryption is done if the -d flag is selected.
+
+-----------------------------------------------------------------------
+PROGRAM FILES:
+
+1. pass_struct.h :
+	* This file contains the following structure:
+		struct myargs {
+        		char infile[NAME_MAX];
+        		char outfile[NAME_MAX];
+        		int keylen;
+        		unsigned char keybuf[16];
+        		int flags; // value 0 as encrypting , value 1 as decrypting
+			};
+	* This common file is imported both in the xcipher.c [user level program] and the 
+	  sys_xcrypt.c [kernel level program].
+	* The values which are got from the command line are initialized for the structure
+	  in the xcipher.c (using memcpy() into a void buffer and sent to the kernel space.)
+	* These values are then used by the kernel program sys_xcrypt.c by copying it back
+	  to the struct myargs structure from void* and used in the encryption and decryption 
+          program.
+
+
+2. xcipher.c :  USER LEVEL PROGRAM
+	* Has various checks to check the correctness of the arguments
+	* -p for password
+	* -e for encryption
+	* -d for decryption
+	* -h for help
+	* three arguments taken also : password , infile and outfile
+	* it hashes the password into an MD5 hash and tehn sends it for encryption/decryption.
+
+3. sys_xcrypt.c : KERNEL LEVEL PROGRAM
+	* Has  methods to implement encryption and  decryption (AES is used in CTR mode.)
+        * this is called by the asmlinkage long xcrypt() function, which implements read/write
+        * keylength is fixed at 16 bytes to be used in the CTR mode
+        * checks are performed in the kernel space to check for various errors which can occur.
+          [Detailed decription in the xcipher.c comments]
+
+4. MAKEFILE:
+	* Has the various commands to create an object
+	* make module, insert and remove it.
+
+-------------------------------------------------------------------------------------------------------------------------
+CITATIONS:
+1. http://www.gnu.org/software/libc/manual/html_node/Getopt.html (used the sample to create the user level program- xhw1.c)
+2. http://www3.cs.stonybrook.edu/~ezk/cse506-f15/hw1.txt  (used to create a separate header file - following the sample code given)
+3. http://www.tutorialspoint.com/c_standard_library/c_function_memcpy.htm (sample seen to copy structure to a buffer)
+4. http://lxr.free-electrons.com/source/net/ceph/crypto.c and CryptoAPI Sources for Encryption and Decryption

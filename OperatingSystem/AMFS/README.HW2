@@ -1,0 +1,104 @@
+#####################################################################
+	
+	HW 2 : CREATING A STACKABLE FILE SYSTEM - ANTI MALWARE FS (amfs)
+
+#####################################################################
+NAME: 		ADITI SINGH
+SBUID : 	110285096
+DATE : 		8 November,2015
+#####################################################################
+Important Files in amfs: [all changes can be seen using this [aditi]
+							I have enclosed my changed codes within comments]
+-------------------------------------------------------------------
+
+1. dentry.c  :  *All instances of wrap changed to am  
+2. Makefile	 :  *Code to compile and insert modules. 
+				*Use $ make to compile and insert module	amfs.ko 
+				*To remove module and clean objects use $ make clean
+3. amfs.mod.c:  *All instances of wrap changed to am  
+4. Kconfig   :	*All instances of wrap changed to am     
+5. main.c	 :  *changes made to 'struct dentry *amfs_mount' to get supper block and call amfs_read_super()
+				*amfs_parse_options() is implemented to parse the argument passed with mount command.
+				*create_pattern_list(char *path) takes the path and creates a doubly linked list with all patterns
+				*both the above functions are called in amfs_read_super() and the linked list head is pointed to by
+					the super block private data structure field. This way the list will be persistant till 
+					super block unmounted.
+					I have added another field in the super block private data structure to hold the path of the pattern
+					database too, so that I can update the file whenever any ioctls are called and it persists.
+6. mmap.c	 :  *All instances of wrap changed to am
+7. amfs.h    :	*All instances of wrap changed to am
+8. built-in.o:	*All instances of wrap changed to am
+9. inode.c	 :	*All instances of wrap changed to am 
+10. lookup.c :	*All instances of wrap changed to am
+11. file.c	 :	* A structure to store the patterns in the linked list. Each node has this structure
+					struct pattern_list
+					{
+						struct list_head list; // the head
+						char *pattern;	       // the actual pattern string
+					};
+				*  amfs_read() 
+					modified to parse the file before reading, to setxattr() an external attribute 
+					'user.bad' to denote it has patterns found in malware. Once intercepted would return -EACCES.
+				*  amfs_write() 
+					modified to parse the file before writing, to setxattr() an external attribute 
+					'user.bad' to denote it has patterns found in malware. 
+					It does not let the file be saved till written malicious patterns are removed.
+					If a previously written bad file is now opened in vim editor, it gives a read error 
+					and a blank editor is opened.
+				*  before setting the external attributes, getxattr() is checking to 
+					see if the attribute has already been set previously.
+					If yes then no read/write done, just the error -EACCES returned.
+				* Setting this attrubute, disabled all functions which require a read, such as cat, grep, head,tail etc.
+					and also functions to write malicious code into file like vim and nornal file writes. 
+					Even copying is disabled since file can't be read, so can't be copied.		
+				* I have not implemented this check on 	lookup functions like ls to hide/delete malicious files.
+				* amfs_unlocked_ioctl() 
+					is updated to process the ioctl() calls from userland. The different command arguments are 
+					sent to kernel and the appropriate action taken. 
+					With every updation and deletion the main pattern database is also updated, to ensure permanence.	
+				* I chose to use the copy_to_user() to pass the patterndb data to user land for the list functionality.
+					but the buffer doesn't get written, so the list functions just prints in the kernel space.
+12. super.c	 :	*All instances of wrap changed to am
+13. amfsctl.c:	*Userspace function to call the Ioctls to insert/remove/list patterns
+				*The arguments to add and remove patterns are the mount point and the pattern.
+					these patterns are added or deleted when the ioctl() systemcall invokes the 
+					amfs_unlocked_ioctl() and the required action is taken to add/remove and list patterns 
+					from the linked list
+				* an update_file() is written to continously update the main patterndb file passed as argument
+					with the mount command.
+
+#########################################################################
+
+PREREQUISITES and STEPS:
+
+1. added a line to include amfs in /usr/src/hw2_adisingh/fs/Kconfig same as that of wrapfs
+2. added line for amfs (85) -> /usr/src/hw2_adisingh/fs/Makefile  same as that of wrapfs
+3. Created a copy of all wrapfs files in /usr/src/hw2_adisingh/fs/amfs  
+		[cp -r /usr/src/hw2_adisingh/fs/wrapfs /usr/src/hw2_adisingh/fs/amfs]
+4. changed all the case insensitive "wrap" to "am"  
+		[grep -i "wrap" /usr/src/hw2_adisingh/fs/amfs/*   => should return empty]
+5. Modified /usr/src/hw2_adisingh/fs/amfs/Makefile
+6. Added a line in include/uapi/linux/magic.h for amfs 
+	[added a unique number for amfs, in my case hex number one more than wrapfs]
+	#define AMFS_SUPER_MAGIC      0xb550ca11   //added by aditi[line 56]
+
+7. Make menuconfig > changed in misc fs -> <M> Wrapfs and <M> amfs
+8. make
+9. make modules
+10. make modules_install install
+11. make in /usr/src/hw2_adisingh/fs/amfs -> creates a objects and inserts module for amfs
+12. mkdir /mnt/amfs
+13. vim /mypatterns.db to create a pattern db
+14. mount -t amfs -o pattdb=/mypatterns.db /usr/src/hw2-adisingh/fs/amfs/ /mnt/amfs  
+		[it panics if the pattdb is null or not existing. So please insert a valid location. ]
+15. cd /mnt/amfs/
+16. Execute all functions thereafter to check for bad files requiring read and write.
+17. To list known patterns
+		$ ./amfsctl -l /mnt/amfs
+18. To add a new pattern
+		$ ./amfsctl -a "newpatt" /mnt/amfs
+19. To remove an old pattern
+		$ ./amfsctl -r "oldpatt" /mnt/amfs
+
+########################################################################################
+
